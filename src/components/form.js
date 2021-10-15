@@ -1,21 +1,25 @@
 import React from "react";
-import './form.css'
 
-const Form = (onSubmit) => {
+const Form = ({ onSubmit }) => {
   return (
-    <div className="FormContainer">
+    <div>
       <form onSubmit={onSubmit}>
         <h2>Insert an item</h2>
-        <input type="number" name="time_spent" placeholder="hours of exercise" className="input"/>
-        <select name="activity" className="optionsForm">
+        <input
+          type="number"
+          name="time_spent"
+          placeholder="hours of exercises"
+          required
+        />
+        <select name="activity" required>
           <option value="">Choose an actvity</option>
           <option value="Run">Run</option>
           <option value="Bike">Bike</option>
           <option value="Swimming">Swimming</option>
         </select>
-        <input type="date" name="date" className="input"/>
+        <input type="date" name="date" required />
 
-        <button type="submit" className="buttonForm">Add</button>
+        <button type="submit">Add</button>
       </form>
     </div>
   );

@@ -1,16 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
+import "./index.css";
 import Form from "./components/form";
-import "./App.css";
+import Table from "./components/table";
+
 function App() {
-  const [activities, setActivities] = useState([
-    { time_spent: "2", activity: "Bike", date: "2021-04-08" },
-    { time_spent: "1", activity: "Run", date: "2021-04-07" },
-  ]);
-  const [totalHours, setTotalHours] = useState("");
+  const [activities, setActivities] = useState([]);
+  const [totalHours, setTotalHours] = useState(0);
+
+  const saveLocalStorage = (activities) => {
+    const activitiesJson = JSON.stringify(activities);
+
+    localStorage.setItem("workout-log-activities", activitiesJson);
+  };
 
   const onSubmit = (event) => {
     event.preventDefault();
-    debugger;
+
     const form = event.currentTarget;
     const formData = new FormData(form);
     const itemAttributes = Object.fromEntries(formData);
@@ -20,11 +25,14 @@ function App() {
     setActivities(newActivities);
     setTotalHours(newHours);
 
+    saveLocalStorage(newActivities);
+
     form.reset();
   };
 
   const removeActivity = (activity) => {
     const indexToRemove = activities.indexOf(activity);
+
     if (indexToRemove !== -1) {
       const newActivities = [
         ...activities.slice(0, indexToRemove),
@@ -34,6 +42,8 @@ function App() {
       const newHours = totalHours - activity.time_spent;
 
       setActivities(newActivities);
+      saveLocalStorage(newActivities);
+      
       setTotalHours(newHours);
     }
   };
@@ -42,30 +52,9 @@ function App() {
     <div className="Container">
       <h1 className="TitlePage">Workout</h1>
       <Form onSubmit={onSubmit} />
-      <table>
-        <thead>
-          <tr>
-            <td className="tableType">Time</td>
-            <td className="tableType">Type</td>
-            <td className="tableType">Date</td>
-            <td className="tableType"> Actions</td>
-          </tr>
-        </thead>
-        <tbody>
-          {activities.map((activity, index) => (
-            <tr key={index}>
-              <td className="tableType">{activity.time_spent}</td>
-              <td className="tableType">{activity.activity}</td>
-              <td className="tableType">{activity.date}</td>
-              <td className="tableType">
-                <span onClick={() => removeActivity(activity)}>X</span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <Table activities={activities} removeActivity={removeActivity} />
 
-      <h1 className="totalHours">{totalHours} Hour(s) of Exercises</h1>
+      <h1>{totalHours} Hour(s) of Exercises</h1>
     </div>
   );
 }
