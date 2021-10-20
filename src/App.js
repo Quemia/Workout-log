@@ -1,16 +1,31 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import "./index.css";
-import Form from "./components/form";
+import TableForm from "./components/form";
 import Table from "./components/table";
+import {AppContainer, Title} from './AppStyle'
 
 function App() {
   const [activities, setActivities] = useState([]);
   const [totalHours, setTotalHours] = useState(0);
 
-  const saveLocalStorage = (activities) => {
+  useEffect(() => {
+    const initalActivities = JSON.parse(
+      localStorage.getItem("workout-log-activities")
+    );
+
+    const initalHours = JSON.parse(
+      localStorage.getItem("workout-totalHours")
+    );
+
+    setActivities(initalActivities || []);
+    setTotalHours(initalHours || 0);
+  }, []);
+
+  const saveLocalStorage = (activities, totalHours) => {
     const activitiesJson = JSON.stringify(activities);
 
     localStorage.setItem("workout-log-activities", activitiesJson);
+    localStorage.setItem("workout-totalHours", totalHours);
   };
 
   const onSubmit = (event) => {
@@ -25,7 +40,7 @@ function App() {
     setActivities(newActivities);
     setTotalHours(newHours);
 
-    saveLocalStorage(newActivities);
+    saveLocalStorage(newActivities, newHours);
 
     form.reset();
   };
@@ -42,20 +57,20 @@ function App() {
       const newHours = totalHours - activity.time_spent;
 
       setActivities(newActivities);
-      saveLocalStorage(newActivities);
-      
       setTotalHours(newHours);
+
+      saveLocalStorage(newActivities, newHours);
     }
   };
 
   return (
-    <div className="Container">
-      <h1 className="TitlePage">Workout</h1>
-      <Form onSubmit={onSubmit} />
+    <AppContainer>
+      <Title className="TitlePage">Workout</Title>
+      <TableForm onSubmit={onSubmit} />
       <Table activities={activities} removeActivity={removeActivity} />
 
-      <h1>{totalHours} Hour(s) of Exercises</h1>
-    </div>
+      <Title>{totalHours} Hour(s) of Exercises</Title>
+    </AppContainer>
   );
 }
 
